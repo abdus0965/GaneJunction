@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDiscountTable extends Migration
+class CreateRoleUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateDiscountTable extends Migration
      */
     public function up()
     {
-        Schema::create('discount', function (Blueprint $table) {
+        Schema::create('role_user', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->string('discount_percent');
-            $table->enum('status', [0, 1])->default(0);
+            $table->integer('user_id');
+            $table->integer('role_id');
+            $table->smallInteger('status')->default(1); 
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ class CreateDiscountTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('discount');
+        Schema::dropIfExists('role_user');
     }
 }

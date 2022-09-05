@@ -25,4 +25,13 @@ class Product extends Model
         'main_image',
         'online_status',
     ];
+
+    /**
+ * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+ */
+public function categories()
+{
+    return $this->belongsToMany(ProductCategory::class, 'category_id');
+}
+
 }

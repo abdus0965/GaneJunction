@@ -1,13 +1,14 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RolesController;
 use App\Http\Controllers\Api\MembershipController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CartController; 
 use App\Http\Controllers\Api\LabCheckController;
+use App\Http\Controllers\Api\AddressController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,16 +25,36 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
-Route::post('login', [UserController::class, 'login']);
-Route::post('register', [UserController::class, 'register']);
-Route::post('updateuser', [UserController::class, 'update']);
-Route::post('changePassword', [UserController::class, 'changePasswordPost']);
-Route::post('logout', [UserController::class, 'logout']);
- 
-Route::group(['middleware' => 'auth:api'], function(){
-Route::post('user-details', [UserController::class, 'userDetails']);
+//route for admin
+Route::group(['prefix' => 'admin','middleware'=>['auth','admin']], function () {
+    Route::get('dashboard', 'DashboardController@index')->name('admin.dashboard');
 });
+
+//route for vendor
+Route::group(['prefix' => 'vendor','middleware'=>['auth','vendor']], function () {
+    Route::get('dashboard', 'DashboardController@vendor')->name('vendor.dashboard');
+});
+
+//route for user
+Route::group(['prefix' => 'user','middleware'=>['auth','user']], function () {
+    Route::get('dashboard', 'DashboardController@user')->name('user.dashboard');
+});
+
+
+Route::post('login', [AuthController::class, 'login']);
+Route::post('register', [AuthController::class, 'register']);
+Route::post('/update/{id}', [AuthController::class, 'updatePost']);
+Route::post('/edit/{id}', [AuthController::class, 'editUser']);
+Route::post('changePassword', [AuthController::class, 'changePasswordPost']);
+Route::post('logout', [AuthController::class, 'logout']);
+
+//address controller
+
+Route::group(['prefix' => 'address'], function () {
+    Route::get('list', [AddressController::class, 'getCountry']);
+});
+
+// roles 
 
 Route::group(['prefix' => 'roles'], function () {
     Route::get('/list', [RolesController::class, 'index']);
@@ -45,15 +66,25 @@ Route::group(['prefix' => 'roles'], function () {
     Route::post('/add-consultants', [RolesController::class, 'storeconsultants']);
 });
 
+//member
+
 Route::group(['prefix' => 'membership'], function () {
     Route::post('/addmember', [MembershipController::class, 'addmember']);
     Route::post('/add', [MembershipController::class, 'store']);
+    Route::post('/update/{id}', [MembershipController::class, 'update']); 
+    Route::post('/edit/{id}', [MembershipController::class, 'editMember']);
     Route::get('/list', [MembershipController::class, 'GetMemberList']);
    
 });
 
+//product
+
 Route::group(['prefix' => 'product'], function () {
     Route::post('/store', [ProductController::class, 'store']);
+    Route::post('/update/{id}', [ProductController::class, 'update']); 
+    Route::post('/edit/{id}', [ProductController::class, 'editProduct']);
+    Route::post('/destroy/{id}', [ProductController::class, 'destroy']);
+
     Route::post('/add', [ProductController::class, 'AddCategory']);
     Route::post('/add-brand', [ProductController::class, 'AddBrand']);
     Route::post('/add-inventory', [ProductController::class, 'AddInventory']);
@@ -64,6 +95,8 @@ Route::group(['prefix' => 'product'], function () {
     Route::post('/add-gallery', [ProductController::class, 'AddProductGallery']);
    
 });
+
+//Labcheck
 
 Route::group(['prefix' => 'labcheck'], function () {
     Route::post('/store', [LabCheckController::class, 'store']);
@@ -76,6 +109,8 @@ Route::group(['prefix' => 'labcheck'], function () {
    
 });
 
+//cart
+
 Route::group(['prefix' => 'cart'], function () {
     Route::post('/add', [CartController::class, 'AddtoCart']); 
     Route::post('/add-order-item', [CartController::class, 'AddOrderItem']);
@@ -83,3 +118,4 @@ Route::group(['prefix' => 'cart'], function () {
     Route::post('/add-payment-details', [CartController::class, 'PaymentDetails']);
    
 });
+

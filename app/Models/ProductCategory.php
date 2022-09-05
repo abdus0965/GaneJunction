@@ -14,4 +14,13 @@ class ProductCategory extends Model
         'name',
         'description',
     ];
+
+    /**
+ * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+ */
+public function products()
+{
+    return $this->belongsToMany(Product::class, 'category_id');
+}
+
 }

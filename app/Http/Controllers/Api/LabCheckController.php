@@ -126,11 +126,11 @@ class LabCheckController extends Controller
                  
           $validator = Validator::make($request->all(), [ 
               'tags' => '',
-              'meta_description' => '',
+              
               ]);
 
               foreach($request->tags as $key) {
-                $data = array('labcheck_tags' => $key['labcheck_tags'],'meta_keywords'=>$key['meta_keywords']);
+                $data = array('labcheck_tags' => $key['labcheck_tags'],'meta_keywords'=>$key['meta_keywords'],'meta_description'=>$key['meta_description']);
                 LabCheckSEO::insert($data);    
             }
                  
@@ -140,7 +140,7 @@ class LabCheckController extends Controller
                  
               $addseo = new LabCheckSEO();
                      
-              $addseo ->meta_description = $request->input('meta_description');
+             // $addseo ->meta_description = $request->input('meta_description');
               $addseo ->save();
                  
               return response()->json(["message" => "LabCheck SEO successfully added!"], $this-> successStatus); 

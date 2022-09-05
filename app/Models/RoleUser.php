@@ -9,12 +9,14 @@ class RoleUser extends Model
 {
     use HasFactory;
 
-    protected $table = 'role_user';
-    protected $fillable = [
-        'user_id',
-        'role_id',
-        'status',
-    ];
+    public function role()
+{
+	return $this->belongsTo(Role::class);
+}
+public function user()
+{
+	return $this->belongsTo(User::class);
+}
 
 
 }

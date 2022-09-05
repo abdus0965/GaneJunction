@@ -13,6 +13,7 @@ use App\Models\ProductAccessories;
 use App\Models\ProductShippingDetails;
 use App\Models\ProductSEO;
 use App\Models\ProductGallery;
+use DB;
 use Validator;
 
 class ProductController extends Controller
@@ -34,10 +35,8 @@ class ProductController extends Controller
     }
     
             $category = new ProductCategory();
-    
             $category ->name = $request->input('name');
             $category ->description = $request->input('description');
-            
             $category ->save();
     
             return response()->json(["message" => "Category successfully added!"], $this-> successStatus); 
@@ -66,6 +65,10 @@ class ProductController extends Controller
         'main_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
     ]);
 
+    if ($validator->fails()) { 
+        return response()->json(['error'=>$validator->errors()], 401);            
+}
+
     $input = $request->all();
 
     if ($image = $request->file('main_image')) {
@@ -80,6 +83,52 @@ class ProductController extends Controller
     return response()->json(["message" => "Product Successfully Added!"], $this-> successStatus);
 }
 
+    // Edit Products
+
+    public function editProduct(Request $request, $id)
+    {
+        $list = Product::select('name', 'short_description', 'main_description', 'sku','price','min_qty','max_qty','stock_quantity','enable_product_option','online_status','main_image')
+            ->where('id', '=', $id)
+            ->get();
+        return response()->json(["message" => "Products Details", 'list' => $list, "code" => 200]);
+    }
+
+    // Update products
+
+    public function update(Request $request, $id)
+    {
+
+        $team = [
+            'category_id' =>  $request->category_id,
+            'name' =>  $request->name,
+            'short_description' =>  $request->short_description,
+            'main_description' =>  $request->main_description,
+            'sku' =>  $request->sku,
+            'inventory_id' =>  $request->inventory_id,
+            'discount_id' =>  $request->discount_id,
+            'price' =>  $request->price,
+            'min_qty' =>  $request->min_qty,
+            'max_qty' =>  $request->max_qty,
+            'stock_quantity' =>  $request->stock_quantity,
+            'enable_product_option' =>  $request->enable_product_option, 
+            'online_status' =>  $request->online_status, 
+            'main_image' =>  $request->main_image, 
+        ];
+
+        $product = Product::where('id',"=",$id)->update($team);
+
+        return response()->json(["message" => "Product Successfully Updated!"], $this-> successStatus);
+    }
+
+
+    // Delete Product
+
+    public function destroy($id) {
+        DB::delete('delete from product where id = ?',[$id]);
+        return response()->json(["message" => "Product Successfully Deleted!"], $this-> successStatus);
+     }
+
+     
 
     // Store Brands
 
@@ -188,7 +237,7 @@ class ProductController extends Controller
                         'length' => 'required',
                         'height' => 'required',
                         'unit' => 'required',
-                        'weight' => 'required',
+                        'weight' => 'required', 
                         ]);
                            
                             if ($validator->fails()) { 
